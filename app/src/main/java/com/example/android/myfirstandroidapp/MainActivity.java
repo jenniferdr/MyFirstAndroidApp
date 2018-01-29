@@ -5,8 +5,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.example.android.myfirstandroidapp.data.New;
 import com.example.android.myfirstandroidapp.utilities.NetworkUtils;
+import com.example.android.myfirstandroidapp.utilities.NewsJsonUtils;
 
+import org.json.JSONException;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
@@ -34,27 +37,31 @@ public class MainActivity extends AppCompatActivity {
         new NewsQueryTask().execute(newsUrl);
     }
 
-    class NewsQueryTask extends AsyncTask<URL,Void,String> {
+    class NewsQueryTask extends AsyncTask<URL,Void,New[]> {
 
         @Override
-        protected String doInBackground(URL... urls) {
+        protected New[] doInBackground(URL... urls) {
             URL urlsearch = urls[0];
 
-            String newsResultString = null;
+            New[] newsList = null;
             try {
-                newsResultString = NetworkUtils.getResponseFromHttpUrl(urlsearch);
+                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(urlsearch);
+                newsList = NewsJsonUtils.getNewsFromJson(jsonResponse);
+
             } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            return newsResultString;
+            return newsList;
         }
 
         @Override
-        protected void onPostExecute(String s) {
-            if(s!=null && !s.equals("")){
-                resultsTextView.setText(s);
-            }
+        protected void onPostExecute(New[] newsList) {
+            //if(s!=null && !s.equals("")){
+                resultsTextView.setText(newsList[0].title);
+            //}
 
         }
     }
