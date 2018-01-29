@@ -56,9 +56,15 @@ public class MainActivity extends AppCompatActivity implements NewsAdapter.ListI
 
     @Override
     public void onListItemClick(String webUrl) {
-        mToast = Toast.makeText(this, webUrl, Toast.LENGTH_LONG);
 
-        mToast.show();
+        Intent startChildActivityIntent = new Intent(MainActivity.this, WebViewActivity.class);
+
+        startChildActivityIntent.putExtra(Intent.EXTRA_TEXT, webUrl);
+
+        startActivity(startChildActivityIntent);
+
+        //mToast = Toast.makeText(this, webUrl, Toast.LENGTH_LONG);
+        //mToast.show();
     }
 
     class NewsQueryTask extends AsyncTask<URL,Void,New[]> {
