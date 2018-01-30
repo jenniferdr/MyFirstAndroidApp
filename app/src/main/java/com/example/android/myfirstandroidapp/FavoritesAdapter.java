@@ -94,7 +94,11 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
         @Override
         public void onClick(View view) {
             int clickedPosition = getAdapterPosition();
-            onClickListener.onListItemClick(newsList[clickedPosition].url);
+            if (!mCursor.moveToPosition(clickedPosition))
+                return; // bail if returned null
+
+            String url = mCursor.getString(mCursor.getColumnIndex(NewsContract.NewsEntry.COLUMN_URL));
+            onClickListener.onListItemClick(url);
         }
     }
 
