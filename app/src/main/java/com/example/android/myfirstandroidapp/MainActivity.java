@@ -1,104 +1,66 @@
 package com.example.android.myfirstandroidapp;
 
-import android.content.Intent;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AppCompatActivity;
 
-import com.example.android.myfirstandroidapp.data.New;
-import com.example.android.myfirstandroidapp.utilities.NetworkUtils;
-import com.example.android.myfirstandroidapp.utilities.NewsJsonUtils;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.json.JSONException;
-import org.w3c.dom.Text;
-
-import java.io.IOException;
-import java.net.URL;
-
-public class MainActivity extends AppCompatActivity implements NewsAdapter.ListItemClickListener {
-
-    RecyclerView recyclerView;
-    NewsAdapter newsAdapter;
-    private Toast mToast;
+public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerview_news);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        LinearLayoutManager layoutManager
-                = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        // Add Fragments to adapter one by one
+        adapter.addFragment(new NewsFragment(), "NEWS");
+        adapter.addFragment(new FavoritesFragment(), "FAVORITES");
 
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
-        newsAdapter = new NewsAdapter(this);
+        viewPager.setAdapter(adapter);
 
-        recyclerView.setAdapter(newsAdapter);
-
-        showNews();
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
 
     }
 
-    /*
-     * Constructs the URL and makes the query in a new thread.
-     */
-    private void showNews() {
-        URL newsUrl = NetworkUtils.getNewsUrl();
-        new NewsQueryTask().execute(newsUrl);
-    }
+    // Adapter for the viewpager using FragmentPagerAdapter
+    class ViewPagerAdapter extends FragmentPagerAdapter {
+        private final List<Fragment> mFragmentList = new ArrayList<>();
+        private final List<String> mFragmentTitleList = new ArrayList<>();
 
-    @Override
-    public void onListItemClick(String webUrl) {
-
-        Intent startChildActivityIntent = new Intent(MainActivity.this, WebViewActivity.class);
-
-        startChildActivityIntent.putExtra(Intent.EXTRA_TEXT, webUrl);
-
-        startActivity(startChildActivityIntent);
-
-        //mToast = Toast.makeText(this, webUrl, Toast.LENGTH_LONG);
-        //mToast.show();
-    }
-
-    class NewsQueryTask extends AsyncTask<URL,Void,New[]> {
-
-        @Override
-        protected New[] doInBackground(URL... urls) {
-            URL urlsearch = urls[0];
-
-            New[] newsList = null;
-            try {
-                String jsonResponse = NetworkUtils.getResponseFromHttpUrl(urlsearch);
-                newsList = NewsJsonUtils.getNewsFromJson(jsonResponse);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-
-            return newsList;
+        public ViewPagerAdapter(FragmentManager manager) {
+            super(manager);
         }
 
         @Override
-        protected void onPostExecute(New[] newsList) {
-            // Verificar si no es null
-            newsAdapter.setNewsList(newsList);
+        public android.support.v4.app.Fragment getItem(int position) {
+            return mFragmentList.get(position);
+        }
 
-            //Intent intent = new Intent(MainActivity.this, WebViewActivity.class);
-            //startActivity(intent);
-            //}
+        @Override
+        public int getCount() {
+            return mFragmentList.size();
+        }
 
+        public void addFragment(Fragment fragment, String title) {
+            mFragmentList.add(fragment);
+            mFragmentTitleList.add(title);
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return mFragmentTitleList.get(position);
         }
     }
-
-
 
 }
