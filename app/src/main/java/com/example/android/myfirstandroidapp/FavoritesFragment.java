@@ -49,11 +49,11 @@ public class FavoritesFragment extends Fragment implements FavoritesAdapter.List
 
         recyclerView.setAdapter(favsAdapter);
 
-        // Get news from database
-        New[] favsList = {new New("Se mueve la tierra","Max","descrip","https://www.google.com") };
-        favsAdapter.setNewsList(favsList);
-
         return view;
+    }
+
+    public void updateView(){
+        favsAdapter.updateData();
     }
 
     @Override

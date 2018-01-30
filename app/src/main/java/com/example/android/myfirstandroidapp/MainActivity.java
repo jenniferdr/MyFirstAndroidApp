@@ -12,7 +12,9 @@ import android.support.v7.app.AppCompatActivity;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NewsFragment.DataBaseChangedListener {
+
+    FavoritesFragment favFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,14 +25,20 @@ public class MainActivity extends AppCompatActivity {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
         // Add Fragments to adapter one by one
-        adapter.addFragment(new NewsFragment(), "NEWS");
-        adapter.addFragment(new FavoritesFragment(), "FAVORITES");
+        favFragment = new FavoritesFragment();
+        adapter.addFragment(new NewsFragment(this), "NEWS");
+        adapter.addFragment(favFragment, "FAVORITES");
 
         viewPager.setAdapter(adapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
 
+    }
+
+    @Override
+    public void updateFavoritesTab() {
+        favFragment.updateView();
     }
 
     // Adapter for the viewpager using FragmentPagerAdapter

@@ -31,8 +31,14 @@ public class NewsFragment extends Fragment implements NewsAdapter.ListItemClickL
     RecyclerView recyclerView;
     NewsAdapter newsAdapter;
 
-    public NewsFragment() {
-        // Required empty public constructor
+    DataBaseChangedListener listener;
+
+    public interface DataBaseChangedListener {
+        void updateFavoritesTab();
+    }
+
+    public NewsFragment(DataBaseChangedListener listener) {
+        this.listener = listener;
     }
 
     @Override
@@ -73,6 +79,12 @@ public class NewsFragment extends Fragment implements NewsAdapter.ListItemClickL
 
         startActivity(startChildActivityIntent);
 
+    }
+
+    @Override
+    public void dataBaseChanged() {
+        // le aviso al mainActivity
+        listener.updateFavoritesTab();
     }
 
     class NewsQueryTask extends AsyncTask<URL,Void,New[]> {

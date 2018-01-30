@@ -30,6 +30,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
 
     public interface ListItemClickListener {
         void onListItemClick(String webUrl);
+        void dataBaseChanged();
     }
 
     public NewsAdapter(ListItemClickListener mOnClickListener, Context context) {
@@ -95,10 +96,13 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
                         // guardar newsList[clickedPosition] en la base de datos
                         // TODO: Verificar primero si la noticia no estaba ya en la BD
                         addNewGuest(newsList[clickedPosition].title, newsList[clickedPosition].author, newsList[clickedPosition].url);
+                        // Notify FavoritesFragment the data has changed
                     }else {
                         toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_empty_star));
                         // TODO: Borrar la noticia de la BD
                     }
+                    // Notify NewsFragment the data has changed
+                    onClickListener.dataBaseChanged();
                 }
             });
 

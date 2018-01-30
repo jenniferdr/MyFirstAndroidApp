@@ -17,7 +17,7 @@ import com.example.android.myfirstandroidapp.data.NewsContract;
 import com.example.android.myfirstandroidapp.data.NewsDbHelper;
 
 /**
- * Created by Andre on 1/30/2018.
+ * Created by Jennifer on 1/30/2018.
  */
 
 public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavoritesAdapterViewHolder>{
@@ -59,7 +59,6 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
 
         return new FavoritesAdapterViewHolder(view);
-
     }
 
     @Override
@@ -102,8 +101,16 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
         }
     }
 
-    public void setNewsList(New[] news) {
-        newsList = news;
+    public void updateData() {
+        mCursor = mDb.query(
+                NewsContract.NewsEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
         notifyDataSetChanged();
     }
 }
