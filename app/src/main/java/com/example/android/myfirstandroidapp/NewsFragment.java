@@ -48,7 +48,7 @@ public class NewsFragment extends Fragment implements NewsAdapter.ListItemClickL
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
-        newsAdapter = new NewsAdapter(this);
+        newsAdapter = new NewsAdapter(this,this.getContext());
 
         recyclerView.setAdapter(newsAdapter);
 

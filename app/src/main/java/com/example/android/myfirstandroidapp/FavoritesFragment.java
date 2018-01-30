@@ -45,10 +45,11 @@ public class FavoritesFragment extends Fragment implements FavoritesAdapter.List
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
-        favsAdapter = new FavoritesAdapter(this);
+        favsAdapter = new FavoritesAdapter(this, this.getContext());
 
         recyclerView.setAdapter(favsAdapter);
 
+        // Get news from database
         New[] favsList = {new New("Se mueve la tierra","Max","descrip","https://www.google.com") };
         favsAdapter.setNewsList(favsList);
 

@@ -1,6 +1,8 @@
 package com.example.android.myfirstandroidapp;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,8 @@ import android.support.v7.widget.RecyclerView;
 import android.widget.ToggleButton;
 
 import com.example.android.myfirstandroidapp.data.New;
+import com.example.android.myfirstandroidapp.data.NewsContract;
+import com.example.android.myfirstandroidapp.data.NewsDbHelper;
 
 
 /**
@@ -20,6 +24,7 @@ import com.example.android.myfirstandroidapp.data.New;
 public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterViewHolder>{
 
     private New[] newsList;
+    private SQLiteDatabase mDb;
 
     final private ListItemClickListener onClickListener;
 
@@ -27,8 +32,10 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
         void onListItemClick(String webUrl);
     }
 
-    public NewsAdapter(ListItemClickListener mOnClickListener) {
+    public NewsAdapter(ListItemClickListener mOnClickListener, Context context) {
         this.onClickListener = mOnClickListener;
+        NewsDbHelper dbHelper = new NewsDbHelper(context);
+        mDb = dbHelper.getWritableDatabase();
     }
 
     @Override
@@ -56,6 +63,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
         return newsList.length;
     }
 
+    private long addNewGuest(String title, String author, String url) {
+        ContentValues cv = new ContentValues();
+        cv.put(NewsContract.NewsEntry.COLUMN_TITLE, title);
+        cv.put(NewsContract.NewsEntry.COLUMN_AUTHOR, author);
+        cv.put(NewsContract.NewsEntry.COLUMN_URL, url);
+        return mDb.insert(NewsContract.NewsEntry.TABLE_NAME, null, cv);
+    }
+
     public class NewsAdapterViewHolder extends RecyclerView.ViewHolder
             implements View.OnClickListener {
 
@@ -68,17 +83,25 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
             view.setOnClickListener(this);
 
             toggleButton = (ToggleButton) view.findViewById(R.id.myToggleButton);
+            // TODO: Settearlo como true si la noticia esta en la BD
             toggleButton.setChecked(false);
             toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_empty_star));
             toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(itemView.getContext(),R.drawable.ic_black_star));
-                else
-                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_empty_star));
-            }
-        });
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked) {
+                        toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_black_star));
+                        int clickedPosition = getAdapterPosition();
+                        // guardar newsList[clickedPosition] en la base de datos
+                        // TODO: Verificar primero si la noticia no estaba ya en la BD
+                        addNewGuest(newsList[clickedPosition].title, newsList[clickedPosition].author, newsList[clickedPosition].url);
+                    }else {
+                        toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_empty_star));
+                        // TODO: Borrar la noticia de la BD
+                    }
+                }
+            });
+
         }
 
         @Override

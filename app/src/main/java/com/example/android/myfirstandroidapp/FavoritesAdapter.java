@@ -1,6 +1,8 @@
 package com.example.android.myfirstandroidapp;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.example.android.myfirstandroidapp.data.New;
+import com.example.android.myfirstandroidapp.data.NewsContract;
+import com.example.android.myfirstandroidapp.data.NewsDbHelper;
 
 /**
  * Created by Andre on 1/30/2018.
@@ -19,6 +23,8 @@ import com.example.android.myfirstandroidapp.data.New;
 public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.FavoritesAdapterViewHolder>{
 
     private New[] newsList;
+    private SQLiteDatabase mDb;
+    Cursor mCursor;
 
     final private ListItemClickListener onClickListener;
 
@@ -26,8 +32,21 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
         void onListItemClick(String webUrl);
     }
 
-    public FavoritesAdapter(ListItemClickListener mOnClickListener) {
+    public FavoritesAdapter(ListItemClickListener mOnClickListener, Context context) {
         this.onClickListener = mOnClickListener;
+        NewsDbHelper dbHelper = new NewsDbHelper(context);
+        mDb = dbHelper.getWritableDatabase();
+
+        // Set newsList
+        mCursor = mDb.query(
+                NewsContract.NewsEntry.TABLE_NAME,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
     }
 
     @Override
@@ -45,14 +64,20 @@ public class FavoritesAdapter extends RecyclerView.Adapter<FavoritesAdapter.Favo
 
     @Override
     public void onBindViewHolder(FavoritesAdapterViewHolder holder, int position) {
-        New newItem = newsList[position];
-        holder.titleTextView.setText(newItem.title);
+
+        if (!mCursor.moveToPosition(position))
+            return; // bail if returned null
+
+        String title = mCursor.getString(mCursor.getColumnIndex(NewsContract.NewsEntry.COLUMN_TITLE));
+
+        //New newItem = newsList[position];
+        holder.titleTextView.setText(title);
     }
 
     @Override
     public int getItemCount() {
-        if(newsList == null) return 0;
-        return newsList.length;
+
+        return mCursor.getCount();
     }
 
     public class FavoritesAdapterViewHolder extends RecyclerView.ViewHolder
