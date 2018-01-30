@@ -23,10 +23,10 @@ import java.net.URL;
  * Created by Jennifer on 1/29/2018.
  */
 
-public class FavoritesFragment extends Fragment implements NewsAdapter.ListItemClickListener {
+public class FavoritesFragment extends Fragment implements FavoritesAdapter.ListItemClickListener {
 
     RecyclerView recyclerView;
-    NewsAdapter newsAdapter;
+    FavoritesAdapter favsAdapter;
 
     public FavoritesFragment() {
         // Required empty public constructor
@@ -45,10 +45,12 @@ public class FavoritesFragment extends Fragment implements NewsAdapter.ListItemC
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
-        newsAdapter = new NewsAdapter(this);
+        favsAdapter = new FavoritesAdapter(this);
 
-        recyclerView.setAdapter(newsAdapter);
+        recyclerView.setAdapter(favsAdapter);
 
+        New[] favsList = {new New("Se mueve la tierra","Max","descrip","https://www.google.com") };
+        favsAdapter.setNewsList(favsList);
 
         return view;
     }

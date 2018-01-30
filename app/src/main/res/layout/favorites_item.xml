@@ -7,20 +7,11 @@
         android:id="@+id/news_title"
         style="@style/TextAppearance.AppCompat.Title"
         android:layout_width="wrap_content"
-        android:maxWidth="300dp"
         android:layout_height="wrap_content"
         android:padding="16dp"
         android:fontFamily="monospace"
         android:textSize="20sp"
         />
 
-    <ToggleButton
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:id="@+id/myToggleButton"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:textOn=""
-        android:textOff=""/>
 
 </LinearLayout>
