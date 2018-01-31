@@ -64,12 +64,17 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
         return newsList.length;
     }
 
-    private long addNewGuest(String title, String author, String url) {
+    private long addNew(String title, String author, String url) {
         ContentValues cv = new ContentValues();
         cv.put(NewsContract.NewsEntry.COLUMN_TITLE, title);
         cv.put(NewsContract.NewsEntry.COLUMN_AUTHOR, author);
         cv.put(NewsContract.NewsEntry.COLUMN_URL, url);
         return mDb.insert(NewsContract.NewsEntry.TABLE_NAME, null, cv);
+    }
+
+    private long deleteNew(String url) {
+        String whereClause = NewsContract.NewsEntry.COLUMN_URL + "=?";
+        return mDb.delete(NewsContract.NewsEntry.TABLE_NAME, whereClause, new String[]{url});
     }
 
     public class NewsAdapterViewHolder extends RecyclerView.ViewHolder
@@ -90,16 +95,14 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
             toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    int clickedPosition = getAdapterPosition();
                     if (isChecked) {
                         toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_black_star));
-                        int clickedPosition = getAdapterPosition();
-                        // guardar newsList[clickedPosition] en la base de datos
-                        // TODO: Verificar primero si la noticia no estaba ya en la BD
-                        addNewGuest(newsList[clickedPosition].title, newsList[clickedPosition].author, newsList[clickedPosition].url);
+                        addNew(newsList[clickedPosition].title, newsList[clickedPosition].author, newsList[clickedPosition].url);
                         // Notify FavoritesFragment the data has changed
                     }else {
                         toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_empty_star));
-                        // TODO: Borrar la noticia de la BD
+                        deleteNew(newsList[clickedPosition].url);
                     }
                     // Notify NewsFragment the data has changed
                     onClickListener.dataBaseChanged();
