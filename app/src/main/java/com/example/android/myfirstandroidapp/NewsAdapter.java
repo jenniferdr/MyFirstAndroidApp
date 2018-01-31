@@ -37,6 +37,13 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
         this.onClickListener = mOnClickListener;
         NewsDbHelper dbHelper = new NewsDbHelper(context);
         mDb = dbHelper.getWritableDatabase();
+
+    }
+
+    private void setIsFavNews(){
+        for(New newItem: newsList){
+            newItem.setIsFav(mDb);
+        }
     }
 
     @Override
@@ -54,8 +61,36 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
 
     @Override
     public void onBindViewHolder(NewsAdapterViewHolder holder, int position) {
+        final int pos = position;
+        final NewsAdapterViewHolder holderFinal = holder;
         New newItem = newsList[position];
         holder.titleTextView.setText(newItem.title);
+
+        boolean checked = newsList[position].isFav;
+        holder.toggleButton.setChecked(checked);
+        if(!checked) {
+            holder.toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_empty_star));
+        }else{
+            holder.toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(holder.itemView.getContext(), R.drawable.ic_black_star));
+        }
+
+        holder.toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                int clickedPosition = pos;
+                if (isChecked) {
+                    buttonView.setBackgroundDrawable(ContextCompat.getDrawable(holderFinal.itemView.getContext(), R.drawable.ic_black_star));
+                    addNew(newsList[clickedPosition].title, newsList[clickedPosition].author, newsList[clickedPosition].url);
+                    // Notify FavoritesFragment the data has changed
+                }else {
+                    buttonView.setBackgroundDrawable(ContextCompat.getDrawable(holderFinal.itemView.getContext(), R.drawable.ic_empty_star));
+                    deleteNew(newsList[clickedPosition].url);
+                }
+                // Notify NewsFragment the data has changed
+                onClickListener.dataBaseChanged();
+            }
+        });
+
     }
 
     @Override
@@ -89,26 +124,6 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
             view.setOnClickListener(this);
 
             toggleButton = (ToggleButton) view.findViewById(R.id.myToggleButton);
-            // TODO: Settearlo como true si la noticia esta en la BD
-            toggleButton.setChecked(false);
-            toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_empty_star));
-            toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    int clickedPosition = getAdapterPosition();
-                    if (isChecked) {
-                        toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_black_star));
-                        addNew(newsList[clickedPosition].title, newsList[clickedPosition].author, newsList[clickedPosition].url);
-                        // Notify FavoritesFragment the data has changed
-                    }else {
-                        toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(itemView.getContext(), R.drawable.ic_empty_star));
-                        deleteNew(newsList[clickedPosition].url);
-                    }
-                    // Notify NewsFragment the data has changed
-                    onClickListener.dataBaseChanged();
-                }
-            });
-
         }
 
         @Override
@@ -120,6 +135,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsAdapterVie
 
     public void setNewsList(New[] news) {
         newsList = news;
+        setIsFavNews();
         notifyDataSetChanged();
     }
 }

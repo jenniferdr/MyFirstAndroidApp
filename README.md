@@ -11,7 +11,6 @@ Espectativas de la aplicación:
 # TODOs
 
 En este momento las funcionalidades que faltan por mejorar son:
-- Al abrir el primer tab se deben mostrar marcadas las noticias que se tienen salvadas como favoritas.
 - Escribir la documentación del proyecto.
 - Hacer todas las validaciones de casos bordes y manejo de errores.
 - Mejorar el diseño visual de la App.
